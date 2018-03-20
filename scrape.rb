@@ -26,15 +26,24 @@ end
 host = "https://www.fcstpauli-ticketboerse.de"
 
 doc = Nokogiri::HTML(open("#{host}/fansale/"))
-entries = doc.css("a.SportEventEntry")
-matches = []
-entries.each do |entry|
-  tickets_url = entry["href"]
-  opponent = entry.css(".SportEventEntry-VersusHeadlineGuestTeam").text.strip
-  matches << Match.new(opponent: opponent, tickets_url: tickets_url)
-end
+matches = build_matches(doc)
 
 matches.each do |match|
+  match_doc = Nokogiri::HTML(open("#{host}/#{match.tickets_url}"))
+  offer_list = match_doc.css("EventEntryList")
+  offer_list.each do |offer|
 
+  end
 end
 puts matches
+
+def build_matches(doc)
+  match_entries = doc.css("a.SportEventEntry")
+  matches = []
+  match_entries.each do |entry|
+    tickets_url = entry["href"]
+    opponent = entry.css(".SportEventEntry-VersusHeadlineGuestTeam").text.strip
+    matches << Match.new(opponent: opponent, tickets_url: tickets_url)
+  end
+  matches
+end
