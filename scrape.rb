@@ -3,39 +3,18 @@
 
 require "nokogiri"
 require "open-uri"
-require "activesupport"
+require "active_support/all"
+require "active_record"
+require "pry"
 
-class Match
-  attr_accessor :opponent, :tickets
-  def initialize(opponent:, tickets_url:)
-    @opponent = opponent
-    @tickets = tickets
-    @tickets_url = tickets_url
-  end
+def main
+  $host = "https://www.fcstpauli-ticketboerse.de"
+
+  doc = Nokogiri::HTML(open("#{$host}/fansale/"))
+  matches = build_matches(doc)
+  build_tickets(matches)
+  binding.pry
 end
-
-class Ticket
-  def initialize(id:, count:, price:, seat:)
-    @id = id
-    @count = count
-    @price = price
-    @seat = seat
-  end
-end
-
-host = "https://www.fcstpauli-ticketboerse.de"
-
-doc = Nokogiri::HTML(open("#{host}/fansale/"))
-matches = build_matches(doc)
-
-matches.each do |match|
-  match_doc = Nokogiri::HTML(open("#{host}/#{match.tickets_url}"))
-  offer_list = match_doc.css("EventEntryList")
-  offer_list.each do |offer|
-
-  end
-end
-puts matches
 
 def build_matches(doc)
   match_entries = doc.css("a.SportEventEntry")
@@ -43,7 +22,44 @@ def build_matches(doc)
   match_entries.each do |entry|
     tickets_url = entry["href"]
     opponent = entry.css(".SportEventEntry-VersusHeadlineGuestTeam").text.strip
-    matches << Match.new(opponent: opponent, tickets_url: tickets_url)
+    matches << Match.find_or_create_by(opponent: opponent, tickets_url: tickets_url)
   end
   matches
 end
+
+def build_tickets(matches)
+  matches.each do |match|
+    match_doc = Nokogiri::HTML(open("#{$host}/#{match.tickets_url}"))
+    offer_list = match_doc.css(".EventEntryList")
+    offer_list.children.each do |offer_div|
+      eventim_id = offer_div.attr("data-offer-id")
+      if eventim_id != nil
+        prices = offer_div.attr("data-ticket-prices")
+        seat_description = offer_div.css(".OfferEntry-SeatDescription").first.text
+        Ticket.find_or_create_by(eventim_id: eventim_id) do |new_ticket|
+          new_ticket.prices = prices
+          new_ticket.seat_description = seat_description
+          new_ticket.match = match
+        end
+      end
+    end
+  end
+end
+
+class Match < ActiveRecord::Base
+  has_many :tickets
+end
+
+class Ticket < ActiveRecord::Base
+  belongs_to :match
+end
+
+# Change the following to reflect your database settings
+ActiveRecord::Base.establish_connection(
+  adapter: "sqlite3",
+  database: "db/development.sqlite3",
+  pool: 5,
+  timeout: 5000,
+)
+
+main
