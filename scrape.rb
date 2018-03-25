@@ -6,6 +6,7 @@ require "open-uri"
 require "active_support/all"
 require "active_record"
 require "pry"
+require_relative "models"
 
 def main
   $host = "https://www.fcstpauli-ticketboerse.de"
@@ -44,14 +45,6 @@ def build_tickets(matches)
       end
     end
   end
-end
-
-class Match < ActiveRecord::Base
-  has_many :tickets
-end
-
-class Ticket < ActiveRecord::Base
-  belongs_to :match
 end
 
 # Change the following to reflect your database settings
