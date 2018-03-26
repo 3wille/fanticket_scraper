@@ -1,4 +1,4 @@
 # frozen_string_literal: true
 class Match < ActiveRecord::Base
-  has_many :tickets
+  has_many :tickets, dependent: :destroy
 end

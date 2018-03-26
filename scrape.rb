@@ -10,11 +10,11 @@ require_relative "models"
 
 def main
   $host = "https://www.fcstpauli-ticketboerse.de"
+  binding.pry
 
   doc = Nokogiri::HTML(open("#{$host}/fansale/"))
   matches = build_matches(doc)
   build_tickets(matches)
-  binding.pry
 end
 
 def build_matches(doc)
@@ -41,13 +41,15 @@ def build_tickets(matches)
           new_ticket.prices = prices
           new_ticket.seat_description = seat_description
           new_ticket.match = match
+          notify(new_ticket)
         end
       end
     end
   end
 end
 
-def notify
+def notify(ticket)
+  TelegramNotifier.new.notify(ticket)
 end
 
 # Change the following to reflect your database settings

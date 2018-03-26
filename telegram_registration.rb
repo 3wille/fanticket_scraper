@@ -32,7 +32,7 @@ class TelegramRegistration
 
   def stop_message(bot, message)
     chat = TelegramChat.find_by(chat_id: message.chat.id)
-    deleted = chat.delete
+    deleted = chat&.destroy
     if deleted
       bot.api.send_message(chat_id: message.chat.id, text: "Bye, #{message.from.first_name}")
     else
