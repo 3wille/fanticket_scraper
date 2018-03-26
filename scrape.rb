@@ -47,6 +47,9 @@ def build_tickets(matches)
   end
 end
 
+def notify
+end
+
 # Change the following to reflect your database settings
 ActiveRecord::Base.establish_connection(
   adapter: "sqlite3",

@@ -11,5 +11,6 @@ gem "standalone_migrations"
 gem "sqlite3"
 gem "rake"
 gem "pry"
+gem "telegram-bot-ruby"
 
 # gem "rails"
