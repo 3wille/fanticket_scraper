@@ -23,7 +23,11 @@ def build_matches(doc)
   match_entries.each do |entry|
     tickets_url = entry["href"]
     opponent = entry.css(".SportEventEntry-VersusHeadlineGuestTeam").text.strip
-    matches << Match.find_or_create_by(opponent: opponent, tickets_url: tickets_url)
+    matches << Match.find_or_create_by(
+      opponent: opponent, tickets_url: tickets_url
+    ) do |match|
+      TelegramNotifier.new.new_match(match)
+    end
   end
   matches
 end
@@ -33,17 +37,21 @@ def build_tickets(matches)
     match_doc = Nokogiri::HTML(open("#{$host}/#{match.tickets_url}"))
     offer_list = match_doc.css(".EventEntryList")
     offer_list.children.each do |offer_div|
-      eventim_id = offer_div.attr("data-offer-id")
-      if eventim_id != nil
-        prices = offer_div.attr("data-ticket-prices")
-        seat_description = offer_div.css(".OfferEntry-SeatDescription").first.text
-        Ticket.find_or_create_by(eventim_id: eventim_id) do |new_ticket|
-          new_ticket.prices = prices
-          new_ticket.seat_description = seat_description
-          new_ticket.match = match
-          notify(new_ticket)
-        end
-      end
+      build_ticket(offer_div)
+    end
+  end
+end
+
+def build_ticket(offer_div)
+  eventim_id = offer_div.attr("data-offer-id")
+  unless eventim_id.nil?
+    prices = offer_div.attr("data-ticket-prices")
+    seat_description = offer_div.css(".OfferEntry-SeatDescription").first.text
+    Ticket.find_or_create_by(eventim_id: eventim_id) do |new_ticket|
+      new_ticket.prices = prices
+      new_ticket.seat_description = seat_description
+      new_ticket.match = match
+      notify(new_ticket)
     end
   end
 end
