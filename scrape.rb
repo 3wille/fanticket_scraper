@@ -11,10 +11,13 @@ require_relative "models"
 def main
   $host = "https://www.fcstpauli-ticketboerse.de"
 
-  doc = Nokogiri::HTML(open("#{$host}/fansale/"))
-  create_matches(doc)
-  matches = Match.all
-  create_tickets(matches)
+  while true do
+    doc = Nokogiri::HTML(open("#{$host}/fansale/"))
+    create_matches(doc)
+    matches = Match.all
+    create_tickets(matches)
+    sleep 10
+  end
 end
 
 def create_matches(doc)
