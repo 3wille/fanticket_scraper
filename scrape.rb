@@ -10,39 +10,41 @@ require_relative "models"
 
 def main
   $host = "https://www.fcstpauli-ticketboerse.de"
-  binding.pry
 
   doc = Nokogiri::HTML(open("#{$host}/fansale/"))
-  matches = build_matches(doc)
-  build_tickets(matches)
+  create_matches(doc)
+  matches = Match.all
+  create_tickets(matches)
 end
 
-def build_matches(doc)
+def create_matches(doc)
   match_entries = doc.css("a.SportEventEntry")
-  matches = []
   match_entries.each do |entry|
-    tickets_url = entry["href"]
-    opponent = entry.css(".SportEventEntry-VersusHeadlineGuestTeam").text.strip
-    matches << Match.find_or_create_by(
-      opponent: opponent, tickets_url: tickets_url
-    ) do |match|
-      TelegramNotifier.new.new_match(match)
-    end
+    build_match(entry)
   end
-  matches
 end
 
-def build_tickets(matches)
+def create_tickets(matches)
   matches.each do |match|
     match_doc = Nokogiri::HTML(open("#{$host}/#{match.tickets_url}"))
     offer_list = match_doc.css(".EventEntryList")
     offer_list.children.each do |offer_div|
-      build_ticket(offer_div)
+      build_ticket(offer_div, match)
     end
   end
 end
 
-def build_ticket(offer_div)
+def build_match(match_div)
+  tickets_url = match_div["href"]
+  opponent = match_div.css(".SportEventEntry-VersusHeadlineGuestTeam").text.strip
+  Match.find_or_create_by(
+    opponent: opponent, tickets_url: tickets_url
+  ) do |match|
+    TelegramNotifier.new.new_match(match)
+  end
+end
+
+def build_ticket(offer_div, match)
   eventim_id = offer_div.attr("data-offer-id")
   unless eventim_id.nil?
     prices = offer_div.attr("data-ticket-prices")
@@ -57,7 +59,7 @@ def build_ticket(offer_div)
 end
 
 def notify(ticket)
-  TelegramNotifier.new.notify(ticket)
+  TelegramNotifier.new.new_ticket(ticket)
 end
 
 # Change the following to reflect your database settings

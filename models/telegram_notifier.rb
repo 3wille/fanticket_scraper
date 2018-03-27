@@ -21,10 +21,14 @@ class TelegramNotifier
   private
 
   def ticket_text(ticket)
-    "New Ticket:\n
-    Opponent: #{ticket.opponent}\n
-    Seat: #{ticket.seat_description}\n
-    Link: #{ticket.match.tickets_url}"
+    "*New Ticket*\n"\
+    "Opponent: #{ticket.opponent}\n"\
+    "Seat: #{ticket.seat_description}\n"\
+    "Link: #{full_ticket_url(ticket.match.tickets_url)}"
+  end
+
+  def full_ticket_url(ticket_url)
+    "#{$host}#{ticket_url}"
   end
 
   def match_text(match)
@@ -33,8 +37,7 @@ class TelegramNotifier
 
   def send_message(chat_id:, text:)
     Telegram::Bot::Client.run(BOT_API_TOKEN) do |bot|
-      binding.pry
-      bot.api.send_message(chat_id: chat_id, text: text)
+      bot.api.send_message(chat_id: chat_id, text: text, parse_mode: "Markdown")
     end
   end
 end
