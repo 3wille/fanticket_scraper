@@ -1,0 +1,9 @@
+[Unit]
+Description=Scrape Eventim FanSale and notify over Telegram
+
+[Service]
+User=freddy
+Group=freddy
+WorkingDirectory=/home/freddy/fanticket_scraper
+Restart=always
+ExecStart=/usr/bin/env ruby scrape.rb

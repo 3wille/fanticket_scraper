@@ -1,0 +1,9 @@
+[Unit]
+Description=Listen for new Telegram Clients on the Bot
+
+[Service]
+User=freddy
+Group=freddy
+WorkingDirectory=/home/freddy/fanticket_scraper
+Restart=always
+ExecStart=/usr/bin/env ruby telegram_registration.rb
