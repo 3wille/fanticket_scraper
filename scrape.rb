@@ -19,9 +19,10 @@ def main
       create_matches(doc)
       matches = Match.all
       create_tickets(matches)
-      sleep 10
     rescue => e
       puts e
+    ensure
+      sleep 10
     end
   end
 end
