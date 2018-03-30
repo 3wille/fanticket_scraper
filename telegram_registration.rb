@@ -3,6 +3,7 @@
 require "telegram/bot"
 require "active_record"
 require_relative "models/telegram_chat"
+require "dotenv/load"
 
 class TelegramRegistration
   BOT_API_TOKEN = ENV["BOT_API_TOKEN"].freeze

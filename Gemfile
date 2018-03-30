@@ -12,5 +12,6 @@ gem "sqlite3"
 gem "rake"
 gem "pry"
 gem "telegram-bot-ruby"
+gem "dotenv"
 
 # gem "rails"

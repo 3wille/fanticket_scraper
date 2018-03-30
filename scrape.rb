@@ -7,16 +7,21 @@ require "active_support/all"
 require "active_record"
 require "pry"
 require_relative "models"
+require "dotenv/load"
 
 def main
   $host = "https://www.fcstpauli-ticketboerse.de"
 
   while true do
-    doc = Nokogiri::HTML(open("#{$host}/fansale/"))
-    create_matches(doc)
-    matches = Match.all
-    create_tickets(matches)
-    sleep 10
+    begin
+      doc = Nokogiri::HTML(open("#{$host}/fansale/"))
+      create_matches(doc)
+      matches = Match.all
+      create_tickets(matches)
+      sleep 10
+    rescue => e
+      puts e
+    end
   end
 end
 
