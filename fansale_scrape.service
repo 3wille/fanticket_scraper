@@ -1,5 +1,6 @@
 [Unit]
-Description=Scrape Eventim FanSale and notify over Telegram
+Description=Eventim FanSale Scraper
+After=syslog.target network.target
 
 [Service]
 User=freddy

@@ -14,6 +14,7 @@ def main
 
   while true do
     begin
+      puts "Starting a new scraping run"
       doc = Nokogiri::HTML(open("#{$host}/fansale/"))
       create_matches(doc)
       matches = Match.all

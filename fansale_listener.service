@@ -1,5 +1,6 @@
 [Unit]
-Description=Listen for new Telegram Clients on the Bot
+Description=Telegram Subscription Bot
+After=syslog.target network.target
 
 [Service]
 User=freddy
