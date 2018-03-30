@@ -36,7 +36,10 @@ class TelegramNotifier
   end
 
   def send_message(chat_id:, text:)
-    Telegram::Bot::Client.run(BOT_API_TOKEN) do |bot|
+    Telegram::Bot::Client.run(
+      BOT_API_TOKEN,
+      logger: Logger.new(STDOUT)
+    ) do |bot|
       bot.api.send_message(chat_id: chat_id, text: text, parse_mode: "Markdown")
     end
   end
