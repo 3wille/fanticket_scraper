@@ -7,13 +7,13 @@ class TelegramNotifier
   BOT_API_TOKEN = ENV["BOT_API_TOKEN"].freeze
 
   def new_ticket(ticket)
-    TelegramChat.all.each do |chat|
+    TelegramSubscription.all.each do |chat|
       send_message(chat_id: chat.chat_id, text: ticket_text(ticket))
     end
   end
 
   def new_match(match)
-    TelegramChat.all.each do |chat|
+    TelegramSubscription.all.each do |chat|
       send_message(chat_id: chat.chat_id, text: match_text(match))
     end
   end

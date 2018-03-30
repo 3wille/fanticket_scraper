@@ -1,5 +1,5 @@
 # frozen_string_literal: true
 
-class TelegramChat < ActiveRecord::Base
+class TelegramSubscription < ActiveRecord::Base
   validates :chat_id, uniqueness: true
 end

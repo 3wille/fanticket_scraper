@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180325195222) do
+ActiveRecord::Schema.define(version: 20180330170513) do
 
   create_table "matches", force: :cascade do |t|
     t.string "opponent"
@@ -19,7 +19,7 @@ ActiveRecord::Schema.define(version: 20180325195222) do
     t.datetime "updated_at", null: false
   end
 
-  create_table "telegram_chats", force: :cascade do |t|
+  create_table "telegram_subscriptions", force: :cascade do |t|
     t.integer "chat_id"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false

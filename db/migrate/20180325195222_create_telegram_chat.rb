@@ -1,4 +1,4 @@
-class CreateTelegramChat < ActiveRecord::Migration[5.1]
+class CreateTelegramSubscription < ActiveRecord::Migration[5.1]
   def change
     create_table :telegram_chats do |t|
       t.integer :chat_id
