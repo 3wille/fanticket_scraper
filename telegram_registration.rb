@@ -50,4 +50,9 @@ ActiveRecord::Base.establish_connection(
   pool: 5,
   timeout: 5000,
 )
-TelegramRegistration.new.register
+Raven.configure do |config|
+  config.dsn = 'https://edd3b9e6098a434c979c3b244b5714b6:ebec75a3b9414adbb9d0200257bdd2e9@sentry.io/866849'
+end
+Raven.capture do
+  TelegramRegistration.new.register
+end

@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 require "telegram/bot"
 require "active_record"
-require_relative "telegram_chat"
+require_relative "telegram_subscription"
 
 class TelegramNotifier
   BOT_API_TOKEN = ENV["BOT_API_TOKEN"].freeze
@@ -38,7 +38,7 @@ class TelegramNotifier
   def send_message(chat_id:, text:)
     Telegram::Bot::Client.run(
       BOT_API_TOKEN,
-      logger: Logger.new(STDOUT)
+      logger: Logger.new($stdout)
     ) do |bot|
       bot.api.send_message(chat_id: chat_id, text: text, parse_mode: "Markdown")
     end

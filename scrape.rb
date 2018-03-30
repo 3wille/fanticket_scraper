@@ -9,16 +9,22 @@ require "pry"
 require_relative "models"
 require "dotenv/load"
 
+require "raven/base"
+# require "raven/integrations/rails"
+# require "raven/integrations/delayed_job"
+
 def main
   $host = "https://www.fcstpauli-ticketboerse.de"
 
   while true do
     begin
-      puts "Starting a new scraping run"
-      doc = Nokogiri::HTML(open("#{$host}/fansale/"))
-      create_matches(doc)
-      matches = Match.all
-      create_tickets(matches)
+      Raven.capture do
+        puts "Starting a new scraping run"
+        doc = Nokogiri::HTML(open("#{$host}/fansale/"))
+        create_matches(doc)
+        matches = Match.all
+        create_tickets(matches)
+      end
     rescue => e
       puts e
     ensure
@@ -72,6 +78,10 @@ def notify(ticket)
   TelegramNotifier.new.new_ticket(ticket)
 end
 
+Raven.configure do |config|
+  config.dsn = 'https://edd3b9e6098a434c979c3b244b5714b6:ebec75a3b9414adbb9d0200257bdd2e9@sentry.io/866849'
+end
+
 # Change the following to reflect your database settings
 ActiveRecord::Base.establish_connection(
   adapter: "sqlite3",
@@ -79,5 +89,4 @@ ActiveRecord::Base.establish_connection(
   pool: 5,
   timeout: 5000,
 )
-
 main

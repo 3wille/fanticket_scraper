@@ -13,5 +13,6 @@ gem "rake"
 gem "pry"
 gem "telegram-bot-ruby"
 gem "dotenv"
+gem "sentry-raven"
 
 # gem "rails"
