@@ -2,8 +2,10 @@
 # frozen_string_literal: true
 require "telegram/bot"
 require "active_record"
-require_relative "models/telegram_chat"
+require_relative "models/telegram_subscription"
 require "dotenv/load"
+require "pry"
+require "raven/base"
 
 class TelegramRegistration
   BOT_API_TOKEN = ENV["BOT_API_TOKEN"].freeze
@@ -27,8 +29,10 @@ class TelegramRegistration
   def start_message(bot, message)
     if created = TelegramSubscription.create(chat_id: message.chat.id)
       bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name}")
+      puts "New Subscriber: #{message.chat.id}"
     else
       bot.api.send_message(chat_id: message.chat.id, text: "Start failed, error:\n#{created}")
+      puts "Subscription failed: #{created}"
     end
   end
 

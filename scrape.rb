@@ -8,18 +8,17 @@ require "active_record"
 require "pry"
 require_relative "models"
 require "dotenv/load"
-
 require "raven/base"
-# require "raven/integrations/rails"
-# require "raven/integrations/delayed_job"
 
 def main
   $host = "https://www.fcstpauli-ticketboerse.de"
+  logger_level = ENV["LOGGER_LEVEL"] || :info
+  $logger = Logger.new(STDOUT, level: logger_level)
 
   while true do
     begin
       Raven.capture do
-        puts "Starting a new scraping run"
+        $logger.info "Starting a new scraping run"
         doc = Nokogiri::HTML(open("#{$host}/fansale/"))
         create_matches(doc)
         matches = Match.all
@@ -89,4 +88,5 @@ ActiveRecord::Base.establish_connection(
   pool: 5,
   timeout: 5000,
 )
+TelegramNotifier.new.get_me
 main
