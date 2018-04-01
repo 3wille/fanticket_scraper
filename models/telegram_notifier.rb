@@ -24,7 +24,9 @@ class TelegramNotifier
       BOT_API_TOKEN,
       logger: Logger.new($stdout)
     ) do |bot|
-      $logger.info bot.api.get_me
+      logger_level = ENV["LOGGER_LEVEL"] || :info
+      logger = Logger.new(STDOUT, level: logger_level)
+      logger.info bot.api.get_me
     end
   end
 
