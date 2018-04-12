@@ -27,7 +27,7 @@ class TelegramRegistration
   private
 
   def start_message(bot, message)
-    if created = TelegramSubscription.create(chat_id: message.chat.id)
+    if created = TelegramSubscription.create(chat_id: message.chat.id, first_name: message.from.first_name)
       bot.api.send_message(chat_id: message.chat.id, text: "Hello, #{message.from.first_name}")
       puts "New Subscriber: #{message.chat.id}"
     else
