@@ -10,13 +10,14 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20180412164505) do
+ActiveRecord::Schema.define(version: 20180805182411) do
 
   create_table "matches", force: :cascade do |t|
     t.string "opponent"
     t.string "tickets_url"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "eventim_id"
   end
 
   create_table "telegram_subscriptions", force: :cascade do |t|

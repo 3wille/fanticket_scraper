@@ -11,17 +11,20 @@ require "dotenv/load"
 require "raven/base"
 
 def main
-  $host = "https://www.fcstpauli-ticketboerse.de"
+  $host = "https://www.eventimsports.de/"
   logger_level = ENV["LOGGER_LEVEL"] || :info
   $logger = Logger.new(STDOUT, level: logger_level)
+  base_url = "https://api.eventim.com/seatmap/api/availability/TIXX/1001"
 
   while true do
     begin
       Raven.capture do
         $logger.info "Starting a new scraping run"
-        doc = Nokogiri::HTML(open("#{$host}/fansale/"))
+        doc = Nokogiri::HTML(open("#{$host}/ols/fcstpauli/de/hs/channel/shop/index/"))
         create_matches(doc)
         matches = Match.all
+        url = "#{base_url}/"
+        binding.pry
         create_tickets(matches)
       end
     rescue => e
@@ -33,9 +36,9 @@ def main
 end
 
 def create_matches(doc)
-  match_entries = doc.css("a.SportEventEntry")
+  match_entries = doc.css(".card.event-card")
   match_entries.each do |entry|
-    build_match(entry)
+    create_match(entry)
   end
 end
 
@@ -49,11 +52,12 @@ def create_tickets(matches)
   end
 end
 
-def build_match(match_div)
-  tickets_url = match_div["href"]
-  opponent = match_div.css(".SportEventEntry-VersusHeadlineGuestTeam").text.strip
-  Match.find_or_create_by(
-    opponent: opponent, tickets_url: tickets_url
+def create_match(match_div)
+  eventim_id = match_div["data-event-id"]
+  opponent = match_div.css(".event-card__heading--away").text.strip
+  tickets_url = match_div.css("a.button").first["href"]
+  Match.create_with(tickets_url: tickets_url).find_or_create_by(
+    opponent: opponent, eventim_id: eventim_id,
   ) do |match|
     TelegramNotifier.new.new_match(match)
   end
